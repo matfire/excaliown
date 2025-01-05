@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/charmbracelet/log"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -10,15 +12,36 @@ import (
 	"github.com/matfire/excaliown/server"
 	"github.com/matfire/excaliown/server/utils"
 	"github.com/matfire/excaliown/ui"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 func main() {
 
+	log.Info("Reading config information")
+	pflag.Int("port", 8080, "specify port for service")
+	pflag.Parse()
+	viper.BindPFlags(pflag.CommandLine)
+	viper.SetDefault("PORT", 8080)
+	viper.SetEnvPrefix("EXC")
+	viper.BindEnv("PORT")
+	viper.SetConfigName("excaliown")
+	viper.AutomaticEnv()
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+
+		} else {
+			panic(err)
+		}
+	}
+	log.Info("Initialising DB")
 	db, err := utils.GetDB()
 	if err != nil {
 		panic("could not connect to database")
 	}
 	db.AutoMigrate(&models.Draw{})
+
+	log.Info("Setting up routes")
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(cors.Handler(cors.Options{
@@ -28,7 +51,11 @@ func main() {
 
 	ui.AddRoutes(router)
 	server.AddRoutes(router)
-	err = http.ListenAndServe(":8080", router)
+
+	port := viper.GetInt("PORT")
+
+	log.Info(fmt.Sprintf("Server listening on port %d", port))
+	err = http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 	if err != nil {
 		panic(err)
 	}
