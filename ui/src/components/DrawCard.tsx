@@ -19,7 +19,7 @@ export default function DrawCard({ draw }: DrawCardProps) {
   const handleDelete = () => {
     if (!draw.ID) return
     mutate(draw.ID, {
-      onSettled(data, error, variables, context) {
+      onSettled(data, error) {
         console.log(data, error)
       },
       onSuccess: () => {
@@ -42,7 +42,7 @@ export default function DrawCard({ draw }: DrawCardProps) {
         /> */}
       </CardContent>
       <CardFooter className="flex justify-between items-center">
-        <span className="text-sm text-gray-500">{draw?.CreatedAt}</span>
+        <span className="text-sm text-gray-500">{draw?.CreatedAt ? new Date(draw?.CreatedAt).toLocaleString() : ""}</span>
         <Button variant="outline" asChild>
           <Link to="/draw/$id" params={{ id: draw.ID?.toString() ?? "" }}>
             Open

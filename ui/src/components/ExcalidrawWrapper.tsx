@@ -15,9 +15,8 @@ export default function ExcalidrawWrapper({ data }: ExcalidrawWrapperProps) {
   useEffect(() => {
     if (data && excalidraw) {
       excalidraw?.updateScene(JSON.parse(data))
-      console.log("updating scene")
-      console.log("data is", data)
     }
+
   }, [data, excalidraw])
 
   return (
