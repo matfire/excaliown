@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path"
 
+	"github.com/adrg/xdg"
 	"github.com/charmbracelet/log"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -26,6 +29,8 @@ func main() {
 	viper.SetEnvPrefix("EXC")
 	viper.BindEnv("PORT")
 	viper.SetConfigName("excaliown")
+	viper.AddConfigPath(path.Join(xdg.ConfigHome, "excaliown"))
+	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -33,6 +38,16 @@ func main() {
 		} else {
 			panic(err)
 		}
+	}
+	log.Info("Initialising Data Directory")
+	dataPath := path.Join(xdg.DataHome, "excaliown")
+	configPath := path.Join(xdg.ConfigHome, "excaliown")
+	if err := os.MkdirAll(dataPath, os.ModePerm); err != nil {
+		panic(err)
+	}
+	log.Info("Initialising Config Directory")
+	if err := os.MkdirAll(configPath, os.ModePerm); err != nil {
+		panic(err)
 	}
 	log.Info("Initialising DB")
 	db, err := utils.GetDB()
