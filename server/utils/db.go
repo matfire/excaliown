@@ -4,11 +4,12 @@ import (
 	"path"
 
 	"github.com/adrg/xdg"
-	"gorm.io/driver/sqlite"
+	_ "github.com/ncruces/go-sqlite3/embed"
+	"github.com/ncruces/go-sqlite3/gormlite"
 	"gorm.io/gorm"
 )
 
 func GetDB() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open(path.Join(xdg.DataHome, "excaliown", "database.db")), &gorm.Config{})
+	db, err := gorm.Open(gormlite.Open(path.Join(xdg.DataHome, "excaliown", "database.db")), &gorm.Config{})
 	return db, err
 }
