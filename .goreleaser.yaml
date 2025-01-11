@@ -60,7 +60,9 @@ brews:
       token: "{{ .Env.GITHUB_TOKEN }}"
 
 dockers:
-  - image_templates: ["ghcr.io/matfire/excaliown:{{ .Version }}"]
+  - image_templates: 
+      - "ghcr.io/matfire/excaliown:{{ .Version }}"
+      - "matfire/excaliown:{{.Version}}"
     dockerfile: Dockerfile
     build_flag_templates:
       - --label=org.opencontainers.image.title={{ .ProjectName }}
